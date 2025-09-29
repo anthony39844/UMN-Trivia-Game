@@ -58,6 +58,9 @@ class Client:
         print("  • After all five questions have been answered, you will receive")
         print("    your total score.")
 
+        self.client_socket = socket(AF_INET, SOCK_STREAM)
+        self.client_socket.connect((self.server_host, self.server_port))    
+
         while(1):
         
             print("\nWould you like to start a new game? [y/n]: ")
@@ -74,11 +77,11 @@ class Client:
             # If the input is "n" or "N", then quit the program.
             if ((st == "n") or (st == "N")):
                 print("\nClient is exiting...")
+                self.client_socket.sendall("quit".encode())
+                self.client_socket.close()
                 sys.exit(0)
 
-            # Create a TCP socket and connect to the server.
-            self.client_socket = socket(AF_INET, SOCK_STREAM)
-            self.client_socket.connect((self.server_host, self.server_port))    
+            self.client_socket.sendall("start".encode())
 
             print(f"\nWelcome to the Trivia Game!\n")
 
@@ -122,8 +125,6 @@ class Client:
                         end = True
                         break
 
-            # Close the socket.
-            self.client_socket.close()
         return  
 
 '''

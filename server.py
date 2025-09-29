@@ -73,39 +73,51 @@ class Server:
           between multiple clients.
     '''
     def trivia_game(self, client_socket, client_address):  
-        score = 0
-        available_keys = list(questions.keys())
+        while True:
 
-        # send questions
-        for _ in range(5):
-            # Pick a random question
-            key = random.choice(available_keys)
-            q, options, answer = questions[key]
+            try:
+                start_signal = client_socket.recv(1024).decode().strip()
+            except ConnectionResetError:
+                break  # Client disconnected
 
-            # Format the question as a string
-            question_text = f"QUESTION:{q} OPTIONS:"
-            for i, option in enumerate(options, start=1):
-                question_text += f"{i}. {option}END:"
-            question_text += "\n"
+            if start_signal.lower() != 'start':
+                break  # Client wants to quit
 
-            # Send question to client
-            client_socket.sendall(question_text.encode())
+            score = 0
+            available_keys = list(questions.keys())
 
-            # Receive client's answer
-            guess = client_socket.recv(1024).decode().strip()
+            # send questions
+            for _ in range(5):
+                # Pick a random question
+                key = random.choice(available_keys)
+                q, options, answer = questions[key]
 
-            # Check answer
-            if guess == answer:
-                score += 1
-                client_socket.sendall("FEEDBACK:CORRECT!\n".encode())
-            else:
-                client_socket.sendall(f"FEEDBACK:WRONG! The answer was '{questions[key][1][int(answer) - 1]}'\n".encode())
-            
-            # Remove the used question
-            available_keys.remove(key)
+                # Format the question as a string
+                question_text = f"QUESTION:{q} OPTIONS:"
+                for i, option in enumerate(options, start=1):
+                    question_text += f"{i}. {option}END:"
+                question_text += "\n"
 
-        # End the game
-        client_socket.sendall(f"GAMEOVER:Total score: {score}\n".encode())
+                # Send question to client
+                client_socket.sendall(question_text.encode())
+
+                # Receive client's answer
+                guess = client_socket.recv(1024).decode().strip()
+
+                # Check answer
+                if guess == answer:
+                    score += 1
+                    client_socket.sendall("FEEDBACK:CORRECT!\n".encode())
+                else:
+                    client_socket.sendall(f"FEEDBACK:WRONG! The answer was '{questions[key][1][int(answer) - 1]}'\n".encode())
+                
+                # Remove the used question
+                available_keys.remove(key)
+
+            # End the game
+            client_socket.sendall(f"GAMEOVER:Total score: {score}\n".encode())
+
+
         return
 
     '''
