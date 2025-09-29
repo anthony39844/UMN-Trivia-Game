@@ -18,8 +18,8 @@ LOCAL_PORT = 5001
 
 # The server's information when the server runs in the cloud and the clients
 # are remote.
-REMOTE_HOST = ""
-REMOTE_PORT = -1
+REMOTE_HOST = "0.0.0.0"
+REMOTE_PORT = 5001
 
 with open("trivia_questions.json", "r") as file:
     questions = json.load(file)
