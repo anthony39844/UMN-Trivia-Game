@@ -81,6 +81,7 @@ class Server:
                 break  # Client disconnected
 
             if start_signal.lower() != 'start':
+                print(f"Client {client_address} is quitting.")
                 break  # Client wants to quit
 
             score = 0
