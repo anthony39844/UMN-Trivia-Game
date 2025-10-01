@@ -148,7 +148,8 @@ class Server:
         print('Performing cleanup...')
         # TODO: Add your cleanup code here (e.g., closing files, releasing 
         # resources, etc.).
-        
+        if self.socket:
+            self.socket.close()
         print('Exiting gracefully.')
         sys.exit(0)
 
